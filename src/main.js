@@ -63,7 +63,7 @@ const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov
 
 function getWeatherIcon(code) {
   const name = WMO_ICONS[code] ?? 'icon-sunny';
-  return `/assets/images/${name}.webp`;
+  return `${import.meta.env.BASE_URL}assets/images/${name}.webp`;
 }
 
 function getWeatherAlt(code) {
