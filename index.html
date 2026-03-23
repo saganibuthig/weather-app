@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="./assets/images/favicon-32x32.png">
+  <title>Weather Now</title>
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header__logo">
+      <img class="svfg-logo" src="./assets/images/logo.svg" alt="Weather Now logo" >
+    </div>
+
+    <!-- Units dropdown -->
+    <div class="units-dropdown" id="unitsDropdown">
+      <button class="units-dropdown__trigger" id="unitsBtn" aria-haspopup="true" aria-expanded="false">
+        <img src="./assets/images/icon-units.svg" alt="" aria-hidden="true" width="16" height="16">
+        Units
+        <img src="./assets/images/icon-dropdown.svg" alt="" aria-hidden="true" width="16" height="16" class="units-dropdown__arrow">
+      </button>
+
+      <div class="units-dropdown__panel" id="unitsPanel" role="dialog" aria-label="Units settings" hidden>
+        <p class="units-dropdown__switch-label" id="unitsSwitchLabel">Switch to Imperial</p>
+
+        <fieldset class="units-group">
+          <legend class="units-group__legend">Temperature</legend>
+          <label class="units-group__option">
+            <span>Celsius (°C)</span>
+            <img src="./assets/images/icon-checkmark.svg" alt="" class="units-group__check" aria-hidden="true">
+            <input type="radio" name="temperature" value="celsius" checked class="sr-only">
+          </label>
+          <label class="units-group__option">
+            <span>Fahrenheit (°F)</span>
+            <img src="./assets/images/icon-checkmark.svg" alt="" class="units-group__check" aria-hidden="true">
+            <input type="radio" name="temperature" value="fahrenheit" class="sr-only">
+          </label>
+        </fieldset>
+
+        <fieldset class="units-group">
+          <legend class="units-group__legend">Wind Speed</legend>
+          <label class="units-group__option">
+            <span>km/h</span>
+            <img src="./assets/images/icon-checkmark.svg" alt="" class="units-group__check" aria-hidden="true">
+            <input type="radio" name="wind" value="kmh" checked class="sr-only">
+          </label>
+          <label class="units-group__option">
+            <span>mph</span>
+            <img src="./assets/images/icon-checkmark.svg" alt="" class="units-group__check" aria-hidden="true">
+            <input type="radio" name="wind" value="mph" class="sr-only">
+          </label>
+        </fieldset>
+
+        <fieldset class="units-group">
+          <legend class="units-group__legend">Precipitation</legend>
+          <label class="units-group__option">
+            <span>Millimeters (mm)</span>
+            <img src="./assets/images/icon-checkmark.svg" alt="" class="units-group__check" aria-hidden="true">
+            <input type="radio" name="precipitation" value="mm" checked class="sr-only">
+          </label>
+          <label class="units-group__option">
+            <span>Inches (in)</span>
+            <img src="./assets/images/icon-checkmark.svg" alt="" class="units-group__check" aria-hidden="true">
+            <input type="radio" name="precipitation" value="inches" class="sr-only">
+          </label>
+        </fieldset>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- Hero search -->
+    <section class="hero" aria-label="Search">
+      <h1 class="hero__heading">How's the sky looking today?</h1>
+
+      <div class="search" role="search">
+        <div class="search__input-wrap">
+          <img src="./assets/images/icon-search.svg" alt="" aria-hidden="true" class="search__icon">
+          <input
+            type="search"
+            id="searchInput"
+            class="search__input"
+            placeholder="Search for a place..."
+            autocomplete="off"
+            aria-label="Search for a city"
+            aria-autocomplete="list"
+            aria-controls="searchSuggestions"
+            aria-expanded="false"
+          >
+          <!-- Autocomplete suggestions -->
+          <ul class="search__suggestions" id="searchSuggestions" role="listbox" aria-label="Search suggestions" hidden></ul>
+        </div>
+        <button class="search__btn" id="searchBtn" type="button">Search</button>
+      </div>
+    </section>
+
+    <!-- APP STATES -->
+
+    <!-- Default / empty state (shown on load) -->
+    <div class="state state--empty" id="stateEmpty">
+      <!-- intentionally empty — heading is the only content before a search -->
+    </div>
+
+    <!-- Loading state -->
+    <div class="state state--loading" id="stateLoading" hidden>
+      <div class="skeleton-layout">
+        <div class="skeleton skeleton--hero"></div>
+        <div class="skeleton-metrics">
+          <div class="skeleton skeleton--metric"></div>
+          <div class="skeleton skeleton--metric"></div>
+          <div class="skeleton skeleton--metric"></div>
+          <div class="skeleton skeleton--metric"></div>
+        </div>
+        <p class="loading-text">
+          <span class="loading-dots"><span></span><span></span><span></span></span>
+          Loading...
+        </p>
+      </div>
+    </div>
+
+    <!-- No results state -->
+    <div class="state state--no-results" id="stateNoResults" hidden>
+      <p class="state__message">No search result found!</p>
+    </div>
+
+    <!-- API error state -->
+    <div class="state state--error" id="stateError" hidden>
+      <img src="./assets/images/icon-error.svg" alt="" aria-hidden="true" class="state__icon">
+      <h2 class="state__heading">Something went wrong</h2>
+      <p class="state__desc">We couldn't connect to the server (API error). Please try again in a few moments.</p>
+      <button class="state__retry-btn" id="retryBtn" type="button">
+        <img src="./assets/images/icon-retry.svg" alt="" aria-hidden="true" width="16" height="16">
+        Retry
+      </button>
+    </div>
+
+    <!-- Weather content (shown after successful search) -->
+    <div class="weather" id="weatherContent" hidden>
+
+      <!-- Left column -->
+      <div class="weather__left">
+
+        <!-- Current weather card -->
+        <div class="weather-card" id="currentWeatherCard">
+          <img src="./assets/images/bg-today-large.svg" alt="" aria-hidden="true" class="weather-card__bg">
+          <div class="weather-card__body">
+            <div class="weather-card__info">
+              <p class="weather-card__city" id="currentCity">—</p>
+              <p class="weather-card__date" id="currentDate">—</p>
+            </div>
+            <div class="weather-card__temp-wrap">
+              <img src="" alt="" class="weather-card__icon" id="currentIcon" width="80" height="80">
+              <p class="weather-card__temp" id="currentTemp">—</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metrics -->
+        <div class="metrics" aria-label="Current weather metrics">
+          <div class="metric-card">
+            <p class="metric-card__label">Feels Like</p>
+            <p class="metric-card__value" id="feelsLike">—</p>
+          </div>
+          <div class="metric-card">
+            <p class="metric-card__label">Humidity</p>
+            <p class="metric-card__value" id="humidity">—</p>
+          </div>
+          <div class="metric-card">
+            <p class="metric-card__label">Wind</p>
+            <p class="metric-card__value" id="wind">—</p>
+          </div>
+          <div class="metric-card">
+            <p class="metric-card__label">Precipitation</p>
+            <p class="metric-card__value" id="precipitation">—</p>
+          </div>
+        </div>
+
+        <!-- Daily forecast -->
+        <section class="daily-forecast" aria-label="7-day forecast">
+          <h2 class="daily-forecast__heading">Daily forecast</h2>
+          <div class="daily-forecast__grid" id="dailyForecastGrid" role="list"></div>
+        </section>
+
+      </div>
+
+      <!-- Right column: Hourly forecast -->
+      <aside class="hourly-forecast" aria-label="Hourly forecast">
+        <div class="hourly-forecast__header">
+          <h2 class="hourly-forecast__heading">Hourly forecast</h2>
+
+          <!-- Day selector dropdown -->
+          <div class="day-select" id="daySelect">
+            <button class="day-select__trigger" id="daySelectBtn" aria-haspopup="listbox" aria-expanded="false">
+              <span id="daySelectLabel">—</span>
+              <img src="./assets/images/icon-dropdown.svg" alt="" aria-hidden="true" width="14" height="14">
+            </button>
+            <ul class="day-select__list" id="daySelectList" role="listbox" aria-label="Select day for hourly forecast" hidden></ul>
+          </div>
+        </div>
+
+        <ul class="hourly-list" id="hourlyList" aria-label="Hourly temperatures"></ul>
+      </aside>
+
+    </div>
+
+  </main>
+
+  <footer class="attribution">
+    Challenge by <a href="https://www.frontendmentor.io?ref=challenge" target="_blank" rel="noopener">Frontend Mentor</a>.
+    Coded by <a href="#">Gani</a>.
+  </footer>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
